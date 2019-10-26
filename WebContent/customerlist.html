@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CheckBox</title>
+<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/demo.css">
+	<script type="text/javascript" src="easyui/js/jquery.min.js"></script>
+	<script type="text/javascript" src="easyui/js/jquery.easyui.min.js"></script>
+	<script>
+	$(function(){
+		init();
+		$('#dlg_update').dialog('close');
+		$('#dlg').dialog('close');
+		$('#deldlg').dialog('close');
+		$('#tt').datagrid({singleSelect:true})
+		$('#ff').form({
+			success:function(data){		
+				$('#tt').datagrid('reload');	
+				$('#ff').form('clear');
+				$('#dlg').dialog('close');
+			}
+		});
+	
+		$('#fff').form({
+			success:function(data){		
+				$('#tt').datagrid('reload');	
+				$('#fff').form('clear');
+				$('#dlg_update').dialog('close');
+			}
+		});
+
+	})
+	function init(){
+		$("#tt").datagrid({
+			columns:[[
+				{field:"ck",checkbox:"true"},
+				{ field: 'cust_id', title: '客户 ID' },
+				{ field: 'cust_name', title: '客户名' },
+				{ field: 'cust_phone', title: '固定电话' },
+				{ field: 'cust_mobile', title: '手机号码' },
+				{ field: 'cust_source', title: '客户来源',formatter:function(value,row,index){
+					if(row.cust_source){return row.cust_source.dict_item_name;}}
+					},
+				{ field: 'cust_industry', title: '客户行业',formatter:function(value,row,index){
+					if(row.cust_industry){return row.cust_industry.dict_item_name;}}
+					 },			
+				{ field: 'cust_level', title: '客户级别',formatter:function(value,row,index){
+					if(row.cust_level){return row.cust_level.dict_item_name; }}
+					 }
+			]]
+		})
+	}
+	</script>
+</head>
+<style>
+
+</style>
+<body style="padding:0px;">
+<!-- 主数据表格start -->
+	<table id="tt" title="客户列表" class="easyui-datagrid" style="width:100%;height:460px;"
+			url="http://localhost:8080/myspring_04/CustomerAction_custList"
+			idField="itemid" pagination="true"
+			iconCls="icon-tip" toolbar="#tb">
+		<thead>
+			<tr>
+				<th field="ck" checkbox="true"></th>
+				<th field="cust_id" width="100" align="center">客户 ID</th>
+				<th field="cust_name" width="100" align="center">客户名</th>
+				<th field="cust_phone" width="120" align="center">固定电话</th>
+				<th field="cust_mobile" width="120" align="center">手机号码</th>
+				<th field="cust_source" data-options="formatter:function(r){return r.dict_item_name}" width="120" align="center">客户来源</th>
+				<th field="cust_industry" data-options="formatter:function(r){return r.dict_item_name}"  width="120" align="center">客户行业</th>
+				<th field="cust_level" data-options="formatter:function(r){return r.dict_item_name}"  width="120" align="center">客户级别</th>					
+									
+			</tr>
+		</thead>
+	</table>
+	<!-- 主数据表格end -->
+<div id="tb">
+<!-- 添加操作图标start -->
+<div>
+	<a href="javascript:;" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="$('#dlg').dialog('open')">添加用户</a>
+	<a href="javascript:;" class="easyui-linkbutton" iconCls="icon-cut" plain="true" onclick="delSelected()">删除用户</a>
+	<a href="javascript:;" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="geteditSelected()">修改用户</a>
+</div>
+<!-- 添加操作图标end-->
+<!-- 添加搜索start-->
+<div>
+	<span>Item ID:</span>
+	<input id="itemid" style="line-height:26px;border:1px solid #ccc">
+	<span>Product ID:</span>
+	<input id="productid" style="line-height:26px;border:1px solid #ccc">
+	<a href="#" class="easyui-linkbutton" plain="true" onclick="doSearch()">Search</a>
+</div>
+<!-- 添加搜索end-->
+</div>
+<!-- 添加用户对话框start -->
+<div id="dlg" class="easyui-dialog" title="添加用户" data-options="iconCls:'icon-save'" style="width:600px;height:400px;padding:10px;">
+		<form id="ff" method="post" action="http://localhost:8080/myspring_04/CustomerAction_saveCustomer">
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>客户名称:</td>
+	    			<td><input class="easyui-textbox" type="text" name="cust_name" data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>联系人:</td>
+	    			<td><input class="easyui-textbox" type="text" name="cust_linkman" data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>手机号码:</td>
+	    			<td><input class="easyui-numberbox" type="text" name="cust_mobile"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>固定电话</td>
+	    			<td><input class="easyui-numberbox" type="text" name="cust_phone"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户来源:</td>
+	    			<td><input id="source" class="easyui-combobox" name="cust_source.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=009'" /> </td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户行业:</td>
+	    			<td>
+	    				<input id="industry" class="easyui-combobox" name="cust_industry.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=001'" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户级别</td>
+					<td>
+	    				<input id="level" class="easyui-combobox" name="cust_level.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=006'" />
+	    			</td>	    		
+	    			</tr> 
+	    	</table>
+	    <div style="text-align:center;padding:5px">
+	    	<input class="easyui-linkbutton"  type="submit"  value="提交">
+	    	<input class="easyui-linkbutton"  type="reset"  value="清空">
+	    </div>
+	    </form>	
+</div>
+<!-- 添加用户对话框end -->
+
+<!-- 修改用户对话框start -->
+<div id="dlg_update" class="easyui-dialog" title="添加用户" data-options="iconCls:'icon-save'" style="width:600px;height:400px;padding:10px;">
+		<form id="fff" method="post" action="http://localhost:8080/myspring_04/CustomerAction_saveCustomer">
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>客户名称:</td>
+	    			<td><input class="easyui-textbox" type="text" name="cust_name" data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>联系人:</td>
+	    			<td><input class="easyui-textbox" type="text" name="cust_linkman" data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>手机号码:</td>
+	    			<td><input class="easyui-numberbox" type="text" name="cust_mobile"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>固定电话</td>
+	    			<td><input class="easyui-numberbox" type="text" name="cust_phone"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户来源:</td>
+	    			<td><input id="source" class="easyui-combobox" name="cust_source.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=009'" /> </td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户行业:</td>
+	    			<td>
+	    				<input id="industry" class="easyui-combobox" name="cust_industry.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=001'" />
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>客户级别</td>
+					<td>
+	    				<input id="level" class="easyui-combobox" name="cust_level.dict_id"   
+  									  data-options="valueField:'dict_id',textField:'dict_item_name',url:'http://localhost:8080/myspring_04/BaseDictAction?dict_type_code=006'" />
+	    			</td>	    		
+	    			</tr> 
+	    	</table>
+	    <div style="text-align:center;padding:5px">
+	    	<input class="easyui-linkbutton"  type="submit"  value="提交">
+	    	<input class="easyui-linkbutton"  type="reset"  value="清空">
+	    </div>
+	    </form>	
+</div>
+<!-- 修改用户对话框end -->
+
+<div id="deldlg" class="easyui-dialog" title="删除对话框"
+	 style="width:400px;height:150px;padding:10px" data-options="buttons: '#deldlg-buttons'">
+		你确定要删除吗？
+</div>
+<div id="deldlg-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="deluser()">确定</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#deldlg').dialog('close')">取消</a>
+</div>
+	
+</body>
+<script>
+
+function geteditSelected(){
+	var row = $('#tt').datagrid('getSelected');
+	$('#dlg_update').dialog('open');
+	if (row){				
+		return 1;
+	/*	JSON.stringify({
+			"cust_id":row.cust_id,
+			"cust_name":row.cust_name,
+			"cust_linkman":row.cust_linkman,
+			"cust_mobile":row.cust_mobile,
+			"cust_phone":row.cust_phone,
+			"cust_source.dict_id":row.cust_source.dict_id,
+			"cust_industry.dict_id":row.cust_industry.dict_id,
+			"cust_level.dict_id":row.cust_level.dict_id}
+	}) */
+		
+	}
+	/*
+var json=JSON.parse(geteditSelected());
+$("#fff").form('load',{
+	cust_id:json.cust_id,
+	cust_name:json.cust_name,
+	cust_linkman:json.cust_linkman,
+	cust_mobile:json.cust_mobile,
+	cust_phone:json.cust_phone,
+	cust_source.dict_id:json.cust_source.dict_id,
+	cust_industry.dict_id:json.cust_industry.dict_id,
+	cust_level.dict_id:json.cust_level.dict_id
+});
+*/
+/*
+$("#source").combobox("setValue",geteditSelected().cust_source.dict_id);
+$("#industry").combobox("setValue",geteditSelected().cust_industry.dict_id);
+$("#level").combobox("setValue",geteditSelected().cust_level.dict_id);
+*/
+
+ function delSelected(){
+	var row = $('#tt').datagrid('getSelected');
+	$('#deldlg').dialog('open');
+	if (row){	
+	return row.u_uid;	
+	}	
+}
+
+ function deluser(){
+	$('#tt').datagrid('reload');	
+	delSelected()
+	$.get("http://localhost:8080/myspring_04/userAction_userdelete",{u_uid:delSelected()},
+			function(data){
+			$('#tt').datagrid('reload');	
+		})
+	$('#deldlg').dialog('close');
+	
+ }
+ 
+
+</script>
+</html>

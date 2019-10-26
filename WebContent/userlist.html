@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>CheckBox</title>
+<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/demo.css">
+	<script type="text/javascript" src="easyui/js/jquery.min.js"></script>
+	<script type="text/javascript" src="easyui/js/jquery.easyui.min.js"></script>
+	<script>
+
+	
+
+	$(function(){
+		
+		
+		
+		$('#dlg_update').dialog('close');
+		$('#dlg').dialog('close');
+		$('#deldlg').dialog('close');
+		$('#tt').datagrid({singleSelect:true})
+		$('#ff').form({
+			success:function(data){		
+				$('#tt').datagrid('reload');	
+				$('#ff').form('clear');
+				$('#dlg').dialog('close');
+			}
+		});
+	
+		$('#fff').form({
+			success:function(data){		
+				$('#tt').datagrid('reload');	
+				$('#fff').form('clear');
+				$('#dlg_update').dialog('close');
+			}
+		});
+
+	})
+	</script>
+</head>
+<style>
+
+</style>
+<body style="padding:0px;">
+<!-- 主数据表格start -->
+	<table id="tt" title="用户列表" class="easyui-datagrid" style="width:100%;height:460px;"
+			url="http://localhost:8080/myspring_04/userAction_userlist"
+			idField="itemid" pagination="true"
+			iconCls="icon-tip" toolbar="#tb">
+		<thead>
+			<tr>
+				<th field="ck" checkbox="true"></th>
+				<th field="u_uid" width="80">用户 ID</th>
+				<th field="u_uname" width="80">用户名</th>
+				<th field="u_upassword" width="80" align="right">用户密码</th>				
+			</tr>
+		</thead>
+	</table>
+	<!-- 主数据表格end -->
+<div id="tb">
+<!-- 添加操作图标start -->
+<div>
+	<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="$('#dlg').dialog('open')">添加用户</a>
+	<a href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true" onclick="delSelected()">删除用户</a>
+	<a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="getSelected()">修改用户</a>
+</div>
+<!-- 添加操作图标end-->
+<!-- 添加搜索start-->
+<div>
+	<span>Item ID:</span>
+	<input id="itemid" style="line-height:26px;border:1px solid #ccc">
+	<span>Product ID:</span>
+	<input id="productid" style="line-height:26px;border:1px solid #ccc">
+	<a href="#" class="easyui-linkbutton" plain="true" onclick="doSearch()">Search</a>
+</div>
+<!-- 添加搜索end-->
+</div>
+<!-- 添加用户对话框start -->
+<div id="dlg" class="easyui-dialog" title="添加用户" data-options="iconCls:'icon-save'" style="width:400px;height:200px;padding:10px;">
+		<form id="ff" method="post" action="http://localhost:8080/myspring_04/userAction_usersave">
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>用户名:</td>
+	    			<td><input class="easyui-textbox" type="text" name="u_uname" data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>密码:</td>
+	    			<td><input class="easyui-textbox" type="password" name="u_upassword" data-options="required:true" ></input></td>
+	    		</tr>
+	    		
+	    	</table>
+	    <div style="text-align:center;padding:5px">
+	    	<input class="easyui-linkbutton"  type="submit"  value="提交">
+	    	<input class="easyui-linkbutton"  type="reset"  value="清空">
+	    </div>
+	    </form>	
+</div>
+<!-- 添加用户对话框end -->
+<!-- 修改用户对话框start -->
+<div id="dlg_update" class="easyui-dialog" title="修改用户" data-options="iconCls:'icon-save'" style="width:400px;height:200px;padding:10px;">
+	    	<form id="fff" method="post" action="http://localhost:8080/myspring_04/userAction_userupdate">
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>用户名:</td>
+	    			<td>
+	    				<input type="hidden" name="u_uid" id="u_uid" >
+	    				<input  type="text" name="u_uname" id="u_uname"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>密码:</td>
+	    			<td><input type="password" name="u_upassword" id="u_upassword"></input></td>
+	    		</tr>
+	    		
+	    	</table>
+	    <div style="text-align:center;padding:5px">
+	    	<input type="submit"  value="提交"  style="padding:5px;font-size:14px;" >
+	    	<input  type="reset"  value="重置"  style="padding:5px;font-size:14px;" >
+	    </div>
+	  </form>
+</div>
+<!-- 修改用户对话框end -->
+<div id="deldlg" class="easyui-dialog" title="删除对话框"
+	 style="width:400px;height:150px;padding:10px" data-options="buttons: '#deldlg-buttons'">
+		你确定要删除吗？
+</div>
+<div id="deldlg-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="deluser()">确定</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="javascript:$('#deldlg').dialog('close')">取消</a>
+</div>
+	
+</body>
+<script>
+
+function getSelected(){
+	var row = $('#tt').datagrid('getSelected');
+	$('#dlg_update').dialog('open');
+	if (row){	
+	var u_uid=	$("#u_uid").val(row.u_uid);
+	var u_uname=	$("#u_uname").val(row.u_uname);
+	var u_upassword=	$("#u_upassword").val(row.u_upassword);	
+	}	
+}
+
+ function delSelected(){
+	var row = $('#tt').datagrid('getSelected');
+	$('#deldlg').dialog('open');
+	if (row){	
+	return row.u_uid;	
+	}	
+}
+
+ function deluser(){
+	$('#tt').datagrid('reload');	
+	delSelected()
+	$.get("http://localhost:8080/myspring_04/userAction_userdelete",{u_uid:delSelected()},
+			function(data){
+			$('#tt').datagrid('reload');	
+		})
+	$('#deldlg').dialog('close');
+	
+ }
+ 
+
+</script>
+</html>

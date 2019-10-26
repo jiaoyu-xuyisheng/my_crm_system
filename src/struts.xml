@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<!-- # struts.objectFactory = spring
+		让spring管理对象！！
+	 -->
+	<constant name="struts.objectFactory" value="spring"></constant>
+	<!-- 更改默认上传文件大小 -->
+	<constant name="struts.multipart.maxSize" value="1000000000" />
+	<package name="myAction" namespace="/" extends="struts-default">
+	<!-- 声明 拦截器 -->
+	<interceptors>
+	<!-- 注册拦截器 -->
+	<interceptor name="Privilege_Interceptor" class="com.jiaoyu.util.Privilege_Interceptor"></interceptor>
+	<!-- 配置拦截器栈 -->
+	<interceptor-stack name="mystack">
+		<interceptor-ref name="Privilege_Interceptor">
+			<param name="excludeMethods">login</param>
+		</interceptor-ref>
+		<interceptor-ref name="defaultStack"></interceptor-ref>
+	</interceptor-stack>
+	
+	</interceptors>
+	<!-- 指定默认拦截器栈 -->
+	<default-interceptor-ref name="mystack"></default-interceptor-ref>
+	
+	<global-results>
+		<result name="tologin" type="redirect">/login.html</result>
+	</global-results>
+	<global-exception-mappings>
+		<exception-mapping result="error" exception="java.lang.RuntimeException"></exception-mapping>
+	</global-exception-mappings>
+		<action name="userAction_*" class="userAction" method="{1}" >
+			<result name="login" type="redirect">/index.jsp</result>
+			<result name="error">/index.jsp</result>
+		</action>
+		
+		<action name="CustomerAction_*" class="ca" method="{1}" >								
+		</action>
+		
+		<action name="BaseDictAction" class="bda" method="getBaseDictList" >											
+		</action>
+		
+		<action name="linkmanAction_*" class="la" method="{1}" >
+			<result name="addLinkman" type="redirectAction" >
+				<param name="namespace">/</param>
+				<param name="actionName">linkmanAction_linklist</param>
+			</result>
+			<result name="linklist">/jsp/linkman/list.jsp</result>
+			<result name="showlink">/jsp/linkman/add.jsp</result>
+				
+		</action>
+		
+		
+		
+	</package>
+</struts>

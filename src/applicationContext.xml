@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd ">
+
+<bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" >
+	<property name="jdbcUrl" value="jdbc:mysql:///hibernate" ></property>
+	<property name="driverClass" value="com.mysql.jdbc.Driver" ></property>
+	<property name="user" value="root" ></property>
+	<property name="password" value="897570" ></property>
+</bean>
+<!-- 核心事务管理器 -->
+<bean name="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+	<property name="sessionFactory" ref="sessionFactory"></property>
+</bean>
+
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	<tx:attributes>
+	<!-- 
+		isolation:隔离级别
+		propagation:传播行为		
+	 -->
+	 	<tx:method name="save*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+		<tx:method name="delete*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+		<tx:method name="update*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
+		<tx:method name="get*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>		
+	</tx:attributes>
+</tx:advice>
+
+<!-- 配置织入 -->
+<aop:config  proxy-target-class="true" >
+	<aop:pointcut expression="execution(* com.jiaoyu.dao.impl.*DaoImpl.*(..))" id="txPc"/>
+	<aop:advisor advice-ref="txAdvice" pointcut-ref="txPc"/>
+</aop:config>
+
+<!-- 将sessionFactory配置到spring容器中 -->
+<bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+	<property name="dataSource" ref="dataSource"></property>
+	<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+</bean>
+
+<!-- action层 -->
+
+<bean name="bda" class="com.jiaoyu.action.BaseDictAction" scope="prototype">
+	<property name="bds" ref="bds"></property>
+</bean>
+<bean name="userAction" class="com.jiaoyu.action.UserAction" scope="prototype">
+	<property name="us" ref="us"></property>
+</bean>
+<bean name="ca" class="com.jiaoyu.action.CustomerAction" scope="prototype">
+	<property name="cs" ref="cs"></property>
+</bean>
+<bean name="la" class="com.jiaoyu.action.linkmanAction" scope="prototype">
+	<property name="ls" ref="ls"></property>
+</bean>
+
+
+<!-- service层 -->
+<bean name="bds" class="com.jiaoyu.serviceImpl.BaseDictServiceImpl">
+	<property name="bdd" ref="bdd"></property>
+</bean>
+<bean name="us" class="com.jiaoyu.service.UserService">
+	<property name="ud" ref="userDao"></property>
+</bean>
+<bean name="cs" class="com.jiaoyu.serviceImpl.customerServiceImpl">
+		<property name="cd" ref="customerDao"></property>	
+</bean>
+<bean name="ls" class="com.jiaoyu.serviceImpl.linkmanServiceImpl">
+		<property name="ld" ref="ld"></property>	
+</bean>
+
+
+<!-- dao层 -->
+<bean name="bdd" class="com.jiaoyu.dao.BaseDictDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>	
+</bean>
+
+<bean name="userDao" class="com.jiaoyu.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>	
+</bean>
+<bean name="customerDao" class="com.jiaoyu.dao.impl.customerDaoImpl">
+			<property name="sessionFactory" ref="sessionFactory"></property>	
+</bean>
+
+<bean name="ld" class="com.jiaoyu.dao.impl.linkmanDaoImpl">
+			<property name="sessionFactory" ref="sessionFactory"></property>	
+</bean>
+
+</beans>
